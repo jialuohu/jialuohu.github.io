@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Folks on Jialuo Hu</title>
-    <link>http://localhost:1313/folks/</link>
+    <link>https://jialuohu.com/folks/</link>
     <description>Recent content in Folks on Jialuo Hu</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 25 Feb 2025 19:20:14 -0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/folks/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 12 Nov 2023 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://jialuohu.com/folks/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>My Folks</title>
-      <link>http://localhost:1313/folks/my-folks/</link>
-      <pubDate>Tue, 25 Feb 2025 19:20:14 -0800</pubDate>
-      <guid>http://localhost:1313/folks/my-folks/</guid>
-      <description>&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.seongjinyoon.com/&#34;&gt;&lt;em&gt;David Yoon&lt;/em&gt;&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://flysandwich.com/&#34;&gt;&lt;em&gt;FlySandwich&lt;/em&gt;&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://junhaow.com/&#34;&gt;&lt;em&gt;ForkerCat&lt;/em&gt;&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;</description>
+      <title>MyFolks</title>
+      <link>https://jialuohu.com/folks/folks/</link>
+      <pubDate>Sun, 12 Nov 2023 00:00:00 +0000</pubDate>
+      <guid>https://jialuohu.com/folks/folks/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://www.seongjinyoon.com/&#34;&gt;&lt;em&gt;David Yoon&lt;/em&gt;&lt;/a&gt;&#xA;&lt;a href=&#34;https://flysandwich.com/&#34;&gt;&lt;em&gt;FlySandwich&lt;/em&gt;&lt;/a&gt;&#xA;&lt;a href=&#34;https://junhaow.com/&#34;&gt;&lt;em&gt;ForkerCat&lt;/em&gt;&lt;/a&gt;&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>
