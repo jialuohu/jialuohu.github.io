@@ -47,7 +47,7 @@
 
 
 
-<link rel="stylesheet" href="/assets/combined.min.7ff6e3f63fb09d40286bff93eb1c176178bf2d7b9a6d97054ce054364ee2b8e3.css" media="all">
+<link rel="stylesheet" href="/assets/combined.min.cafd6cb4ea465f523e1e52c9c52bb65ef79f140f139c69c6099682d082fb1611.css" media="all">
 
 
 
@@ -136,13 +136,20 @@
   Projects
   <a class="anchor" href="#projects">#</a>
 </h2>
-<p><strong><code>UMIX OS Kernel Modules</code></strong></p>
+<p><strong><code>UMIX OS Kernel Modules</code></strong> <em>(Jan - Mar 2025)</em></p>
 <ul>
 <li>UMIX, a user-mode <strong>UNIX-based</strong> operating system, is written in <em>C</em>.</li>
 <li>Developed <strong>Process Creation</strong>, <strong>Context Switching</strong> for <strong><code>Yield</code></strong>, <strong><code>Fork</code></strong> system calls.</li>
 <li>Implemented a <strong>User-Level</strong> Thread Library using <strong><code>setjmp()/longjmp()</code></strong>.</li>
 <li>Designed <strong>CPU Scheduling Policies</strong> including <em>FIFO</em>, <em>LIFO</em>, <em>Round Robin</em>, <em>MLFQ</em>, and <em>Proportional Scheduling</em>.</li>
 <li>Developed semaphores for <strong>synchronization</strong> and integrated shared memory.</li>
+</ul>
+<p><strong><code>Peter DB Kernel</code></strong> <em>(Jan 2024 - Mar 2025)</em></p>
+<ul>
+<li>Developed a comprehensive <strong>Database Kernel</strong> by architecting and implementing a multi-layered system from the ground up.</li>
+<li>Created a <strong>Paged File (PF) Manager</strong> to handle fundamental file and page operations, which served as the backbone for a <strong>Record-Based File (RBF) manager</strong> built atop it for efficient data storage and retrieval</li>
+<li>Designed a <strong>Relation manager (RM)</strong> to orchestrate tuple-level operations and integrated an <strong>indexing (IX) component</strong> to enable persistent, single-attribute indexes that <em>accelerate relational selections</em>, <em>joins</em>, and <em>condition-based updates</em> or <em>deletions</em>.</li>
+<li>Extended the <strong>RM</strong> to seamlessly coordinate both the record and <em>indexing layers</em> and developed a <strong>query engine (QE)</strong> that processes SQL queries using <em>iterator-based relational operators</em>, resulting in a robust, scalable, and high-performance database system.</li>
 </ul>
 <h2 class="heading" id="education">
   Education
