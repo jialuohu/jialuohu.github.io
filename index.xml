@@ -6,21 +6,13 @@
     <description>Recent content in Home on Jialuo Hu</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 12 Nov 2023 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://jialuohu.com/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>MyFolks</title>
-      <link>https://jialuohu.com/folks/folks/</link>
-      <pubDate>Sun, 12 Nov 2023 00:00:00 +0000</pubDate>
-      <guid>https://jialuohu.com/folks/folks/</guid>
-      <description>&lt;p&gt;&lt;a href=&#34;https://www.seongjinyoon.com/&#34;&gt;&lt;em&gt;David Yoon&lt;/em&gt;&lt;/a&gt;&#xA;&lt;a href=&#34;https://flysandwich.com/&#34;&gt;&lt;em&gt;FlySandwich&lt;/em&gt;&lt;/a&gt;&#xA;&lt;a href=&#34;https://junhaow.com/&#34;&gt;&lt;em&gt;ForkerCat&lt;/em&gt;&lt;/a&gt;&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>MyFolks</title>
+      <title>My Folks</title>
       <link>https://jialuohu.com/misc/folks/</link>
-      <pubDate>Sun, 12 Nov 2023 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>https://jialuohu.com/misc/folks/</guid>
-      <description>&lt;p&gt;&lt;a href=&#34;https://www.seongjinyoon.com/&#34;&gt;&lt;em&gt;David Yoon&lt;/em&gt;&lt;/a&gt;&#xA;&lt;a href=&#34;https://flysandwich.com/&#34;&gt;&lt;em&gt;FlySandwich&lt;/em&gt;&lt;/a&gt;&#xA;&lt;a href=&#34;https://junhaow.com/&#34;&gt;&lt;em&gt;ForkerCat&lt;/em&gt;&lt;/a&gt;&lt;/p&gt;</description>
+      <description>&lt;ul&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://www.seongjinyoon.com/&#34;&gt;&lt;em&gt;David Yoon&lt;/em&gt;&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://flysandwich.com/&#34;&gt;&lt;em&gt;FlySandwich&lt;/em&gt;&lt;/a&gt;&lt;/li&gt;&#xA;&lt;li&gt;&lt;a href=&#34;https://junhaow.com/&#34;&gt;&lt;em&gt;ForkerCat&lt;/em&gt;&lt;/a&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;They are AMAZING 🐻&lt;/p&gt;&lt;/blockquote&gt;</description>
     </item>
   </channel>
 </rss>
