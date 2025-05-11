@@ -99,6 +99,13 @@
         
       
         <p class="small ">
+            <a href="/projects/main" >
+                /projs
+            </a>
+        </p>
+        
+      
+        <p class="small ">
             <a href="/misc/folks" >
                 /folks
             </a>
@@ -119,14 +126,6 @@
 <div class="list-container">
 
     
-<div class="breadcrumbs">
-    
-    <a href="/">Home</a>
-    <span class="breadcrumbs-separator"> / </span>
-    
-    <a href="/projects/">Projects</a>
-</div>
-
 
     <h1>Projects</h1>
     
@@ -164,6 +163,103 @@
   Under Construction
   <a class="anchor" href="#under-construction">#</a>
 </h2> </p>
+        
+    </div>
+</div>
+    
+
+    
+
+    
+    <div class="post-line">
+
+    
+    
+    
+    
+
+    <p class="line-date">Jan 1 0001 </p>
+
+    <div>
+        <p class="line-title">
+            <a href="/projects/dist-kv-store/">
+                Distributed Key-Value Store
+            </a>
+        </p>
+
+        
+        <p class="line-summary"> <h2 class="heading" id="architecture">
+  Architecture
+  <a class="anchor" href="#architecture">#</a>
+</h2>
+<p>
+
+
+
+
+
+
+
+
+
+
+
+<figure class="">
+
+    <div>
+        <img loading="lazy" alt="arch image" src="/images/dist-kv-store/architecture.png" >
+    </div>
+
+    
+</figure>
+</p>
+<h2 class="heading" id="ring--backends">
+  Ring &amp; Backends
+  <a class="anchor" href="#ring--backends">#</a>
+</h2>
+<p>We applied a structure called &ldquo;Ring&rdquo; which is similar to the Chord Ring to organize our Backends server. The <code>ReplicaBins</code> layer turns a loose collection of backend key‑value stores into a fault‑tolerant, quorum‑style shard that behaves like a single logical bin. Each bin is assigned to a primary + two backups by hashing the bin‐name prefix onto a sorted consistent‑hash ring. All client operations first map the prefix to its ideal server index; from there the code hunts clockwise until it reaches a live backend, as recorded in the lazily updated reachability table. Writes are turned into idempotent log entries—<code>clock()::action::payload</code>—so that even if a server rejoins half‑way through, it can replay the log and converge on the same state; helper routines like <code>consume_ks_log</code> and <code>consume_kl_log</code> fold the log stream into a final key string or list. A successful write to the primary is immediately propagated to the next two live nodes, while reads tolerate failures by linearly probing until a healthy copy is found. Throughout, the logical clocks give a total order, and key names are salted with the shard‑hash so that parallel bins never clash.</p> </p>
+        
+    </div>
+</div>
+    
+
+    
+
+    
+    <div class="post-line">
+
+    
+    
+    
+    
+
+    <p class="line-date">Jan 1 0001 </p>
+
+    <div>
+        <p class="line-title">
+            <a href="/projects/main/">
+                Projects
+            </a>
+        </p>
+
+        
+        <p class="line-summary"> <h3 class="heading" id="distributed-key-value-store--report-here">
+  Distributed Key-Value Store ➡️ <a href="/projects/dist-kv-store"><code>Report Here!</code></a>
+  <a class="anchor" href="#distributed-key-value-store--report-here">#</a>
+</h3>
+<p>(Apr 2025 - May 2025)</p>
+<ul>
+<li>Created a Distributed <strong>Fault-Tolerant</strong> Key-Value Store, written in <strong>Rust</strong>, that automatically
+replicates data across primary and backup nodes, delivering <strong>High Availability</strong> and horizontal scalability.</li>
+<li>Implemented a self‑healing control plane in <strong>gRPC</strong> with one‑second heartbeats, Lamport‑clock convergence,
+and zero‑touch <strong>Failover/Migration</strong>, ensuring continuous service under node or network failures.</li>
+<li>Added idempotent <strong>Write‑Ahead Logging</strong> and <strong>Quorum‑based</strong> reads/writes, giving strong ordering, eventual consistency, and fast rejoin recovery without manual intervention.</li>
+</ul>
+<h3 class="heading" id="os-kernel-modules">
+  OS Kernel Modules
+  <a class="anchor" href="#os-kernel-modules">#</a>
+</h3>
+<p>(Jan 2025 - Mar 2025)</p> </p>
         
     </div>
 </div>

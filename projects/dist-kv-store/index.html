@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en-us"
+  dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+
+
+
+<link rel="icon" type="image/ico" href="https://jialuohu.com//favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://jialuohu.com//favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://jialuohu.com//favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="https://jialuohu.com//android-chrome-192x192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://jialuohu.com//apple-touch-icon.png">
+
+<meta name="description" content=""/>
+
+
+
+<title>
+    
+    Distributed Key-Value Store | Jialuo Hu
+    
+</title>
+
+<link rel="canonical" href="https://jialuohu.com/projects/dist-kv-store/"/>
+
+<meta property="og:url" content="https://jialuohu.com/projects/dist-kv-store/">
+  <meta property="og:site_name" content="Jialuo Hu">
+  <meta property="og:title" content="Distributed Key-Value Store">
+  <meta property="og:description" content="Architecture # Ring &amp; Backends # We applied a structure called “Ring” which is similar to the Chord Ring to organize our Backends server. The ReplicaBins layer turns a loose collection of backend key‑value stores into a fault‑tolerant, quorum‑style shard that behaves like a single logical bin. Each bin is assigned to a primary &#43; two backups by hashing the bin‐name prefix onto a sorted consistent‑hash ring. All client operations first map the prefix to its ideal server index; from there the code hunts clockwise until it reaches a live backend, as recorded in the lazily updated reachability table. Writes are turned into idempotent log entries—clock()::action::payload—so that even if a server rejoins half‑way through, it can replay the log and converge on the same state; helper routines like consume_ks_log and consume_kl_log fold the log stream into a final key string or list. A successful write to the primary is immediately propagated to the next two live nodes, while reads tolerate failures by linearly probing until a healthy copy is found. Throughout, the logical clocks give a total order, and key names are salted with the shard‑hash so that parallel bins never clash.">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="projects">
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/assets/combined.min.9a068642fec075caa5f5ea8c4325bae187bd956d0f93ddbbb9b4228a0597b285.css" media="all">
+
+
+
+
+
+
+
+
+
+</head>
+
+
+
+
+
+
+
+<body class="light">
+
+  <div class="content">
+    <header>
+      
+
+<div class="header">
+
+    
+
+    <h1 class="header-title">
+        <a href="https://jialuohu.com/">Jialuo Hu</a>
+    </h1>
+
+    <div class="flex">
+        
+
+        
+        
+      
+        <p class="small ">
+            <a href="/" >
+                /home
+            </a>
+        </p>
+        
+      
+        <p class="small ">
+            <a href="/misc/certs" >
+                /certs
+            </a>
+        </p>
+        
+      
+        <p class="small ">
+            <a href="/projects/main" >
+                /projs
+            </a>
+        </p>
+        
+      
+        <p class="small ">
+            <a href="/misc/folks" >
+                /folks
+            </a>
+        </p>
+        
+        
+    </div>
+
+    
+
+</div>
+
+    </header>
+
+    <main class="main">
+      
+
+
+
+
+
+
+
+<div >
+
+  <div class="single-intro-container">
+
+    
+
+    <h1 class="single-title">Distributed Key-Value Store</h1>
+    
+
+    
+
+    <p class="single-readtime">
+      
+
+      
+    </p>
+
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  <div class="single-content">
+    <h2 class="heading" id="architecture">
+  Architecture
+  <a class="anchor" href="#architecture">#</a>
+</h2>
+<p>
+
+
+
+
+
+
+
+
+
+
+
+<figure class="">
+
+    <div>
+        <img loading="lazy" alt="arch image" src="/images/dist-kv-store/architecture.png" >
+    </div>
+
+    
+</figure>
+</p>
+<h2 class="heading" id="ring--backends">
+  Ring &amp; Backends
+  <a class="anchor" href="#ring--backends">#</a>
+</h2>
+<p>We applied a structure called &ldquo;Ring&rdquo; which is similar to the Chord Ring to organize our Backends server. The <code>ReplicaBins</code> layer turns a loose collection of backend key‑value stores into a fault‑tolerant, quorum‑style shard that behaves like a single logical bin. Each bin is assigned to a primary + two backups by hashing the bin‐name prefix onto a sorted consistent‑hash ring. All client operations first map the prefix to its ideal server index; from there the code hunts clockwise until it reaches a live backend, as recorded in the lazily updated reachability table. Writes are turned into idempotent log entries—<code>clock()::action::payload</code>—so that even if a server rejoins half‑way through, it can replay the log and converge on the same state; helper routines like <code>consume_ks_log</code> and <code>consume_kl_log</code> fold the log stream into a final key string or list. A successful write to the primary is immediately propagated to the next two live nodes, while reads tolerate failures by linearly probing until a healthy copy is found. Throughout, the logical clocks give a total order, and key names are salted with the shard‑hash so that parallel bins never clash.</p>
+<h2 class="heading" id="backend-failure--migration--rejoin">
+  Backend Failure &amp; Migration &amp; Rejoin
+  <a class="anchor" href="#backend-failure--migration--rejoin">#</a>
+</h2>
+<p>When a backend (BE) drops out of a three‑node replica set, the keeper initiates a fault‑specific migration routine that always preserves two in‑sync copies of every key.  If the failed node was Backup #2 (<strong>case 1</strong>) the keeper scans counter‑clockwise around the consistent‑hash ring until it reaches the first previous live BE, pulls the entire key/list log that logically belongs to the lost hash range, then scans clockwise to the first next live BE and streams the data into that host—restoring the replica trio without touching the primary’s copy.  If Backup #1 dies (<strong>case 2</strong>) the search direction flips: the keeper walks clockwise to the first next live BE to harvest authoritative state, then continues one more hop to the next‑next live BE and installs the data there, again re‑establishing two backups on distinct machines.  If the primary fails (<strong>case 3</strong>) availability is most critical, so the keeper immediately promotes the first next live BE by copying its state, then skips one extra replica (to avoid mirroring the same physical box) and pushes the payload into the next‑next‑next live BE, thereby electing a fresh primary and rebuilding both backups in a single pass.  In all three scenarios the algorithm relies only on liveness probes and idempotent full‑state transfers, guaranteeing that every hash partition ends the repair cycle with a healthy primary plus two up‑to‑date backups, independent of where the failure occurred. Rejoin will be similar way. The graph is attached below.
+
+
+
+
+
+
+
+
+
+
+
+
+<figure class="">
+
+    <div>
+        <img loading="lazy" alt="migration image" src="/images/dist-kv-store/migration.png" >
+    </div>
+
+    
+</figure>
+</p>
+<h2 class="heading" id="ring--keepers--solutions">
+  Ring &amp; Keepers &amp; Solutions
+  <a class="anchor" href="#ring--keepers--solutions">#</a>
+</h2>
+<p>The Keeper layer is the distributed &ldquo;control plane&rdquo; that keeps every backend (BE) and fellow keeper (KP) healthy and correctly replicated.  At startup each keeper hashes every BE address onto a consistent‑hash ring, and also marks itself in another ring which is used for keepers peers, and launches a lightweight gRPC server that answers one RPC request <code>heart_beat_check</code>. The main serve loop works in three phases that repeat every second:</p>
+<ol>
+<li>
+<p>Heartbeat &amp; Liveness map – <code>kp_heartbeats</code> sends the RPC to every entry in <code>ring_kp</code>, updating the backends alive table; <code>be_heartbeats</code> talks to the BE to see whether the data plane is reachable.  Any unreachable BE hash is queued in <code>migrate_be_q</code>; a BE that responds but advertises <code>false</code> is scheduled in <code>rejoin_be_q</code>.</p>
+</li>
+<li>
+<p>Clock convergence – all live BEs are pinged for their Lamport clock and the maximum is fanned back out, guaranteeing that every server’s logical time only moves forward before a migration.</p>
+</li>
+<li>
+<p>Repair actions – <code>process_failed_be</code> copies the full keyspace from the surviving replicas (primary → backup 1 → backup 2 pattern) onto a brand‑new target BE; <code>process_rejoin_be</code> performs the symmetric load when a server comes back.  Both routines walk the ring clockwise, retrying until either two healthy sources are found or the entire ring has been exhausted.</p>
+</li>
+</ol>
+<p>Our keeper layer is itself organized as a second‑level consistent‑hash ring that mirrors the backend layout, so that each keeper is responsible for the slice of backend hashes that falls between its own position and that of its predecessor.  Using the same hash function for both tiers gives us a deterministic mapping: the BE that stores a key and the keeper that manages that BE are derived from the same token, eliminating any extra lookup tables.  Every keeper runs a periodic heartbeat loop in two directions—one that pings the set of backends in its slice and one that pings its fellow keepers.  If a backend in its jurisdiction becomes unreachable, the keeper immediately launches the migration routine described earlier to re‑replicate the data onto live nodes.  If a keeper itself fails, its successor on the keeper ring detects the missing heartbeat, marks the fallen node as dead, and atomically assumes ownership of the entire backend slice that hash‑ranges to the failed keeper; because the ring is already sorted by hash, this takeover requires no global coordination—only a local expansion of the successor’s monitored range. The graph is attached below about each keeper handles part of backends.
+
+
+
+
+
+
+
+
+
+
+
+
+<figure class="">
+
+    <div>
+        <img loading="lazy" alt="keeper image" src="/images/dist-kv-store/keepers.png" >
+    </div>
+
+    
+</figure>
+</p>
+
+    
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+  <div class="back-to-top">
+    <a href="#top">
+      back to top
+    </a>
+  </div>
+  
+
+</div>
+
+
+    </main>
+  </div>
+
+  <footer>
+    
+
+    
+    
+    
+    <p>☕️ <strong>2025 &lt;/&gt;</strong></p>
+    
+
+
+  </footer>
+
+  
+
+</body>
+
+<script src="/js/theme-switch.js"></script>
+<script defer src="/js/copy-code.js"></script>
+</html>
