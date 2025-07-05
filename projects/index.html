@@ -243,23 +243,21 @@
         </p>
 
         
-        <p class="line-summary"> <h3 class="heading" id="distributed-key-value-store--report-here">
+        <p class="line-summary"> <h3 class="heading" id="raft-consensus-core--report-here">
+  Raft Consensus Core ➡️ <a href="/pdfs/raft-core.pdf"><code>Report Here!</code></a>
+  <a class="anchor" href="#raft-consensus-core--report-here">#</a>
+</h3>
+<p>(May 2025 - Present)</p>
+<ul>
+<li>Developed a Go-based <strong>Raft Consensus Core</strong> with <strong>gRPC</strong> for inter-node communication, implementing leader election, heartbeat-based failure detection, log replication to ensure <strong>Strong Consistency</strong> and <strong>Fault Tolerance</strong> across the cluster.</li>
+<li>Integrated <strong>Pebble KV Store</strong> for durable <strong>Write-Ahead Logging</strong> and <strong>LSM Compaction</strong>, guaranteeing <strong>Data Persistence</strong> and enabling seamless <strong>Recovery</strong> after node crashes.</li>
+<li>Designed modular StateMachine API for applying and snapshot-based recovery commands, separating consensus mechanism from application logic.</li>
+</ul>
+<h3 class="heading" id="distributed-key-value-store--report-here">
   Distributed Key-Value Store ➡️ <a href="/projects/dist-kv-store"><code>Report Here!</code></a>
   <a class="anchor" href="#distributed-key-value-store--report-here">#</a>
 </h3>
-<p>(Apr 2025 - May 2025)</p>
-<ul>
-<li>Created a Distributed <strong>Fault-Tolerant</strong> Key-Value Store, written in <strong>Rust</strong>, that automatically
-replicates data across primary and backup nodes, delivering <strong>High Availability</strong> and horizontal scalability.</li>
-<li>Implemented a self‑healing control plane in <strong>gRPC</strong> with one‑second heartbeats, Lamport‑clock convergence,
-and zero‑touch <strong>Failover/Migration</strong>, ensuring continuous service under node or network failures.</li>
-<li>Added idempotent <strong>Write‑Ahead Logging</strong> and <strong>Quorum‑based</strong> reads/writes, giving strong ordering, eventual consistency, and fast rejoin recovery without manual intervention.</li>
-</ul>
-<h3 class="heading" id="os-kernel-modules">
-  OS Kernel Modules
-  <a class="anchor" href="#os-kernel-modules">#</a>
-</h3>
-<p>(Jan 2025 - Mar 2025)</p> </p>
+<p>(Apr 2025 - May 2025)</p> </p>
         
     </div>
 </div>
