@@ -1,0 +1,134 @@
+# Builds this doggen site and publishes it on Cloudflare Pages, on every push to the doggen branch.
+#
+# Temporary. doggen has no release yet, so this workflow builds doggen itself, from the commit in
+# DOGGEN_COMMIT of the private repository jialuohu/doggen. To update doggen, change DOGGEN_COMMIT.
+# The site is served at the project's pages.dev address. jialuohu.com keeps serving the Hugo site
+# on the main branch through GitHub Pages.
+#
+# Repository secrets, under Settings > Secrets and variables > Actions:
+#   CLOUDFLARE_API_TOKEN   a Cloudflare API token with the permission Account > Cloudflare Pages > Edit
+#   CLOUDFLARE_ACCOUNT_ID  the ID of the Cloudflare account
+#   DOGGEN_READ_TOKEN      a fine-grained GitHub token for jialuohu/doggen only, with Contents: Read-only
+name: Cloudflare Pages
+on:
+  push:
+    branches: ["doggen"]
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: cloudflare-pages
+  cancel-in-progress: false
+env:
+  DOGGEN_COMMIT: cb236b06e866bd66b07b709d40907eddcec9e9e1
+  PAGES_PROJECT: jialuohu
+  PRODUCTION_BRANCH: doggen
+  WRANGLER_VERSION: 4.152.0
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - name: Check the secrets
+        env:
+          HAS_CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
+          HAS_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID != '' }}
+          HAS_DOGGEN_READ_TOKEN: ${{ secrets.DOGGEN_READ_TOKEN != '' }}
+        run: |
+          missing=""
+          [ "$HAS_CLOUDFLARE_API_TOKEN" = true ] || missing="$missing CLOUDFLARE_API_TOKEN"
+          [ "$HAS_CLOUDFLARE_ACCOUNT_ID" = true ] || missing="$missing CLOUDFLARE_ACCOUNT_ID"
+          [ "$HAS_DOGGEN_READ_TOKEN" = true ] || missing="$missing DOGGEN_READ_TOKEN"
+          if [ -n "$missing" ]; then
+            echo "::error::Add these repository secrets under Settings > Secrets and variables > Actions, then run this workflow again:$missing"
+            exit 1
+          fi
+
+      - name: Check out the site
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: site
+          persist-credentials: false
+
+      - name: Restore doggen
+        id: cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.doggen-bin
+          key: doggen-${{ env.DOGGEN_COMMIT }}-${{ runner.os }}-${{ runner.arch }}
+
+      - name: Check out doggen
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: jialuohu/doggen
+          ref: ${{ env.DOGGEN_COMMIT }}
+          token: ${{ secrets.DOGGEN_READ_TOKEN }}
+          path: doggen-src
+          persist-credentials: false
+
+      - name: Build doggen
+        if: steps.cache.outputs.cache-hit != 'true'
+        working-directory: doggen-src
+        env:
+          # This log is public, and doggen's source is not. Warnings would quote it.
+          RUSTFLAGS: -Awarnings
+        run: |
+          cargo build --release --locked --quiet -p doggen
+          mkdir -p ~/.doggen-bin
+          install -m 755 target/release/doggen ~/.doggen-bin/doggen
+
+      - name: Find or create the Pages project
+        id: project
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects"
+          auth="Authorization: Bearer $CLOUDFLARE_API_TOKEN"
+          answer="$RUNNER_TEMP/project.json"
+          code=$(curl -sS -o "$answer" -w '%{http_code}' -H "$auth" "$api/$PAGES_PROJECT")
+          if [ "$code" = 404 ]; then
+            code=$(curl -sS -o "$answer" -w '%{http_code}' -H "$auth" \
+              --json "{\"name\":\"$PAGES_PROJECT\",\"production_branch\":\"$PRODUCTION_BRANCH\"}" "$api")
+          fi
+          case "$code" in
+            200 | 201) ;;
+            *)
+              echo "::error::Cloudflare answered $code: $(jq -c '.errors' "$answer"). Check that CLOUDFLARE_API_TOKEN has Account > Cloudflare Pages > Edit, and that CLOUDFLARE_ACCOUNT_ID is the account's ID."
+              exit 1
+              ;;
+          esac
+          branch=$(jq -r '.result.production_branch' "$answer")
+          if [ "$branch" != "$PRODUCTION_BRANCH" ]; then
+            echo "::error::The Pages project $PAGES_PROJECT publishes the branch $branch. Set its production branch to $PRODUCTION_BRANCH in the Cloudflare dashboard."
+            exit 1
+          fi
+          host=$(jq -r '.result.subdomain // empty' "$answer")
+          case "$host" in
+            "") echo "::error::Cloudflare gave no pages.dev address for $PAGES_PROJECT."; exit 1 ;;
+            *.pages.dev) ;;
+            *) host="$host.pages.dev" ;;
+          esac
+          echo "url=https://$host" >> "$GITHUB_OUTPUT"
+
+      - name: Build the site
+        working-directory: site
+        env:
+          SITE_URL: ${{ steps.project.outputs.url }}
+        run: ~/.doggen-bin/doggen build --ci --base-url "$SITE_URL"
+
+      - name: Set up Node.js for Wrangler
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+
+      - name: Publish on Cloudflare Pages
+        working-directory: site
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: "false"
+        run: npx --yes "wrangler@$WRANGLER_VERSION" pages deploy public --project-name "$PAGES_PROJECT" --branch "$PRODUCTION_BRANCH"

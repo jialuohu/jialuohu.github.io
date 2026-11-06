@@ -1,0 +1,3 @@
+# Search engines index the site at its own domain, not at its pages.dev address.
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex

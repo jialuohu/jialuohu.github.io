@@ -1,0 +1,14 @@
+name = "Jialuo Hu"
+role = "M.S. student in Computer Science"
+affiliations = [{ name = "University of California, San Diego" }]
+bio = """
+I'm a Master student in **Computer Science** ☕️ at *University of California, San Diego*, after a B.S. in Computer Science at *University of California, Irvine*. ⛰️ Nomad Photographer ([*@hu_frame*](https://www.instagram.com/hu_frame/)) with Canon EOS R10 📷. Mi nombre es Jialuo Hu. ¡Mucho gusto! 😊"""
+interests = [
+  "Operating Systems & Distributed Systems",
+  "High Performance Computing",
+  "Computer Networks & Datacenter Networks",
+]
+
+[links]
+github = "jialuohu"
+linkedin = "jialuohu"

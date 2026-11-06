@@ -1,0 +1,9 @@
+# Site settings. The full list is in doggen's format spec (spec/format/README.md).
+[engine]
+version = "0.0.1"      # the doggen release that builds this site
+
+[site]
+title = "Jialuo Hu"
+url = "https://jialuohu.com"
+language = "en"
+timezone = "UTC"             # such as "America/New_York"; dates are read in this zone
