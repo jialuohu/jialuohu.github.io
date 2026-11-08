@@ -1,7 +1,8 @@
 # Builds this doggen site and publishes it on Cloudflare Pages, on every push to the doggen branch.
 #
-# Temporary. doggen has no release yet, so this workflow builds doggen itself, from the commit in
-# DOGGEN_COMMIT of the private repository jialuohu/doggen. To update doggen, change DOGGEN_COMMIT.
+# Temporary. doggen has no release yet, so this workflow builds doggen itself, from the latest commit on
+# main of the private repository jialuohu/doggen. It caches the build by commit, so it builds doggen again
+# only when main has moved. A new doggen commit reaches the site at the next run of this workflow.
 # The site is served at the project's pages.dev address. jialuohu.com keeps serving the Hugo site
 # on the main branch through GitHub Pages.
 #
@@ -19,7 +20,6 @@ concurrency:
   group: cloudflare-pages
   cancel-in-progress: false
 env:
-  DOGGEN_COMMIT: cb236b06e866bd66b07b709d40907eddcec9e9e1
   PAGES_PROJECT: jialuohu
   PRODUCTION_BRANCH: doggen
   WRANGLER_VERSION: 4.152.0
@@ -51,22 +51,27 @@ jobs:
           path: site
           persist-credentials: false
 
+      - name: Check out doggen
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: jialuohu/doggen
+          ref: main
+          token: ${{ secrets.DOGGEN_READ_TOKEN }}
+          path: doggen-src
+          persist-credentials: false
+
+      - name: Find doggen's commit
+        id: doggen
+        run: |
+          commit=$(git -C doggen-src rev-parse HEAD)
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+
       - name: Restore doggen
         id: cache
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.doggen-bin
-          key: doggen-${{ env.DOGGEN_COMMIT }}-${{ runner.os }}-${{ runner.arch }}
-
-      - name: Check out doggen
-        if: steps.cache.outputs.cache-hit != 'true'
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: jialuohu/doggen
-          ref: ${{ env.DOGGEN_COMMIT }}
-          token: ${{ secrets.DOGGEN_READ_TOKEN }}
-          path: doggen-src
-          persist-credentials: false
+          key: doggen-${{ steps.doggen.outputs.commit }}-${{ runner.os }}-${{ runner.arch }}
 
       - name: Build doggen
         if: steps.cache.outputs.cache-hit != 'true'
